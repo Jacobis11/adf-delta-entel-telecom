@@ -1,0 +1,45 @@
+{
+	"name": "ds_dim_destino",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_sql_dw_entel",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Gold"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "id_destino",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "numero_b",
+				"type": "varchar"
+			},
+			{
+				"name": "imei_b",
+				"type": "varchar"
+			},
+			{
+				"name": "rbs_utilizada_b",
+				"type": "varchar"
+			},
+			{
+				"name": "celda_b",
+				"type": "varchar"
+			},
+			{
+				"name": "latitud_longitud_b",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "GOLD",
+			"table": "dim_destino"
+		}
+	}
+}
