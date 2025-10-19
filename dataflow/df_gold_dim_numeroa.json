@@ -1,0 +1,61 @@
+{
+	"name": "df_gold_dim_numeroa",
+	"properties": {
+		"folder": {
+			"name": "GOLD"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_sql_silver_llamadas_entel",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_dim_origen",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [],
+			"scriptLines": [
+				"source(output(",
+				"          numero_origen as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT DISTINCT\\r\\n  TRY_CAST(NUMERO_A AS VARCHAR(25)) AS numero_origen\\r\\nFROM SILVER.LLAMADA\\r\\nWHERE NUMERO_A IS NOT NULL AND NUMERO_A <> \\'-\\'',",
+				"     format: 'query') ~> source1",
+				"source1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          id_origen as integer,",
+				"          numero_a as string,",
+				"          imei_a as string,",
+				"          rbs_utilizada_a as string,",
+				"          celda_a as string,",
+				"          latitud_longitud_a as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          numero_a = numero_origen",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}
