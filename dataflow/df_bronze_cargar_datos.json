@@ -1,0 +1,63 @@
+{
+	"name": "df_bronze_cargar_datos",
+	"properties": {
+		"folder": {
+			"name": "BRONZE"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_datos_entel_csv",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_sql_datos_entel",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [],
+			"scriptLines": [
+				"source(output(",
+				"          {\"FECHA_INICIO\";\"FECHA_FIN\";\"NUMERO\";\"IMEI\";\"RBS_UTILIZADA\";\"CELDA\";\"LATITUD LONGITUD\";\"SUBIDOS\";\"DESCARGADOS\";\"TOTAL\"} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          FECHA_INICIO as string,",
+				"          FECHA_FIN as string,",
+				"          NUMERO as string,",
+				"          IMEI as string,",
+				"          RBS_UTILIZADA as string,",
+				"          CELDA as string,",
+				"          LATITUD_LONGITUD as string,",
+				"          SUBIDOS as string,",
+				"          DESCARGADOS as string,",
+				"          TOTAL as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          FECHA_INICIO = {\"FECHA_INICIO\";\"FECHA_FIN\";\"NUMERO\";\"IMEI\";\"RBS_UTILIZADA\";\"CELDA\";\"LATITUD LONGITUD\";\"SUBIDOS\";\"DESCARGADOS\";\"TOTAL\"}",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}

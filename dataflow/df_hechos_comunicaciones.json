@@ -1,0 +1,212 @@
+{
+	"name": "df_hechos_comunicaciones",
+	"properties": {
+		"folder": {
+			"name": "GOLD"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_sql_silver_llamadas_entel",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_dim_servicio",
+						"type": "DatasetReference"
+					},
+					"name": "Dimservicio"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_dim_origen",
+						"type": "DatasetReference"
+					},
+					"name": "Dimorigen"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_dim_fecha",
+						"type": "DatasetReference"
+					},
+					"name": "Dimfecha"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_dim_direccion",
+						"type": "DatasetReference"
+					},
+					"name": "Dimdireccion"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_dim_destino",
+						"type": "DatasetReference"
+					},
+					"name": "Dimdestino"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_hechos_comunicaciones",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "lookup1"
+				},
+				{
+					"name": "lookup2"
+				},
+				{
+					"name": "lookup3"
+				},
+				{
+					"name": "lookup4"
+				},
+				{
+					"name": "lookup5"
+				},
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          SERVICIO as string,",
+				"          REGISTRO as string,",
+				"          NUMERO_A as string,",
+				"          IMEI_A as string,",
+				"          RBS_UTILIZADA_A as string,",
+				"          CELDA_A as string,",
+				"          LATITUD_LONGITUD_A as string,",
+				"          NUMERO_B as string,",
+				"          IMEI_B as string,",
+				"          RBS_UTILIZADA_B as string,",
+				"          CELDA_B as string,",
+				"          LATITUD_LONGITUD_B as string,",
+				"          FECHA as date,",
+				"          DURACION as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> source1",
+				"source(output(",
+				"          id_servicio as integer,",
+				"          servicio as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select id_servicio, servicio \\nfrom GOLD.dim_servicio',",
+				"     format: 'query') ~> Dimservicio",
+				"source(output(",
+				"          id_origen as integer,",
+				"          numero_a as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select id_origen, numero_a\\nfrom GOLD.dim_origen\\n',",
+				"     format: 'query') ~> Dimorigen",
+				"source(output(",
+				"          id_fecha as integer,",
+				"          fecha as date,",
+				"          {año} as integer,",
+				"          mes as integer,",
+				"          mes_texto as string,",
+				"          dia_texto as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select id_fecha, fecha, año, mes, mes_texto, dia_texto \\nfrom GOLD.dim_fecha\\n',",
+				"     format: 'query') ~> Dimfecha",
+				"source(output(",
+				"          id_direccion as integer,",
+				"          direccion as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select id_direccion, direccion \\nfrom GOLD.dim_direccion\\n',",
+				"     format: 'query') ~> Dimdireccion",
+				"source(output(",
+				"          id_destino as integer,",
+				"          numero_b as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select id_destino, numero_b \\nfrom GOLD.dim_destino\\n',",
+				"     format: 'query') ~> Dimdestino",
+				"source1, Dimservicio lookup(source1@SERVICIO == Dimservicio@servicio,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup1",
+				"lookup1, Dimorigen lookup(source1@NUMERO_A == Dimorigen@numero_a,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup2",
+				"lookup2, Dimfecha lookup(source1@FECHA == Dimfecha@fecha,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup3",
+				"lookup3, Dimdireccion lookup(REGISTRO == direccion,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup4",
+				"lookup4, Dimdestino lookup(source1@NUMERO_B == Dimdestino@numero_b,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup5",
+				"lookup5 select(mapColumn(",
+				"          DURACION,",
+				"          id_servicio,",
+				"          id_origen,",
+				"          id_fecha,",
+				"          id_direccion,",
+				"          id_destino",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          id_llamada as integer,",
+				"          duracion as integer,",
+				"          id_servicio as integer,",
+				"          id_direccion as integer,",
+				"          id_origen as integer,",
+				"          id_destino as integer,",
+				"          id_fecha as integer",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          duracion = DURACION,",
+				"          id_servicio,",
+				"          id_direccion,",
+				"          id_origen,",
+				"          id_destino,",
+				"          id_fecha",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}
