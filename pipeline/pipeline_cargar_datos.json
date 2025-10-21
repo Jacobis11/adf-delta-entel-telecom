@@ -1,5 +1,5 @@
 {
-	"name": "pipeline_limpiar_datos",
+	"name": "pipeline_cargar_datos",
 	"properties": {
 		"activities": [
 			{
@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "df_limpiar_llamadas",
+						"referenceName": "df_bronze_cargar_datos",
 						"type": "DataFlowReference"
 					},
 					"compute": {
@@ -28,7 +28,7 @@
 			}
 		],
 		"folder": {
-			"name": "Silver"
+			"name": "Bronze"
 		},
 		"annotations": []
 	}

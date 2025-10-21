@@ -1,0 +1,54 @@
+{
+	"name": "df_limpiar_datos",
+	"properties": {
+		"folder": {
+			"name": "SILVER"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_sql_datos_entel",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          FECHA_INICIO as string,",
+				"          FECHA_FIN as string,",
+				"          NUMERO as string,",
+				"          IMEI as string,",
+				"          RBS_UTILIZADA as string,",
+				"          CELDA as string,",
+				"          LATITUD_LONGITUD as string,",
+				"          SUBIDOS as string,",
+				"          DESCARGADOS as string,",
+				"          TOTAL as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> source1",
+				"source1 derive(FECHA_INICIO = ERROR_FUNCTION(''),",
+				"          FECHA_FIN = ERROR_FUNCTION(''),",
+				"          NUMERO = ERROR_FUNCTION(''),",
+				"          IMEI = ERROR_FUNCTION(''),",
+				"          RBS_UTILIZADA = ERROR_FUNCTION(''),",
+				"          CELDA = ERROR_FUNCTION(''),",
+				"          LATITUD_LONGITUD = ERROR_FUNCTION(''),",
+				"          SUBIDOS = ERROR_FUNCTION(''),",
+				"          DESCARGADOS = ERROR_FUNCTION(''),",
+				"          TOTAL = ERROR_FUNCTION('')) ~> derivedColumn1"
+			]
+		}
+	}
+}
