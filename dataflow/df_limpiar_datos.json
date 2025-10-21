@@ -15,10 +15,24 @@
 					"name": "source1"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_sql_silver_datos_entel",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
 					"name": "derivedColumn1"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "cast1"
 				}
 			],
 			"scriptLines": [
@@ -38,16 +52,64 @@
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     format: 'table') ~> source1",
-				"source1 derive(FECHA_INICIO = ERROR_FUNCTION(''),",
-				"          FECHA_FIN = ERROR_FUNCTION(''),",
-				"          NUMERO = ERROR_FUNCTION(''),",
-				"          IMEI = ERROR_FUNCTION(''),",
-				"          RBS_UTILIZADA = ERROR_FUNCTION(''),",
-				"          CELDA = ERROR_FUNCTION(''),",
-				"          LATITUD_LONGITUD = ERROR_FUNCTION(''),",
-				"          SUBIDOS = ERROR_FUNCTION(''),",
-				"          DESCARGADOS = ERROR_FUNCTION(''),",
-				"          TOTAL = ERROR_FUNCTION('')) ~> derivedColumn1"
+				"source1 derive(FECHA_INICIO = trim(FECHA_INICIO),",
+				"          FECHA_FIN = trim(FECHA_FIN),",
+				"          NUMERO = trim(NUMERO),",
+				"          IMEI = trim(IMEI),",
+				"          RBS_UTILIZADA = trim(RBS_UTILIZADA),",
+				"          CELDA = trim(CELDA),",
+				"          LATITUD_LONGITUD = trim(LATITUD_LONGITUD),",
+				"          SUBIDOS = trim(SUBIDOS),",
+				"          DESCARGADOS = trim(DESCARGADOS),",
+				"          TOTAL = trim(TOTAL)) ~> derivedColumn1",
+				"derivedColumn1 filter(!isNull(FECHA_INICIO) && FECHA_INICIO != '-' &&\r",
+				"!isNull(FECHA_FIN) && FECHA_FIN != '-' &&\r",
+				"!isNull(NUMERO) && NUMERO != '-' &&\r",
+				"!isNull(TOTAL) && TOTAL != '-'\r",
+				") ~> filter1",
+				"filter1 cast(output(",
+				"          FECHA_INICIO as date 'dd-MM-yyyy HH:mm:ss',",
+				"          FECHA_FIN as date 'dd-MM-yyyy HH:mm:ss',",
+				"          CELDA as integer,",
+				"          SUBIDOS as integer,",
+				"          DESCARGADOS as integer,",
+				"          TOTAL as integer",
+				"     ),",
+				"     errors: true) ~> cast1",
+				"cast1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          FECHA_INICIO as timestamp,",
+				"          FECHA_FIN as timestamp,",
+				"          NUMERO as string,",
+				"          IMEI as string,",
+				"          RBS_UTILIZADA as string,",
+				"          CELDA as integer,",
+				"          LATITUD_LONGITUD as string,",
+				"          SUBIDOS as long,",
+				"          DESCARGADOS as long,",
+				"          TOTAL as long",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          FECHA_INICIO,",
+				"          FECHA_FIN,",
+				"          NUMERO,",
+				"          IMEI,",
+				"          RBS_UTILIZADA,",
+				"          CELDA,",
+				"          LATITUD_LONGITUD,",
+				"          SUBIDOS,",
+				"          DESCARGADOS,",
+				"          TOTAL",
+				"     )) ~> sink1"
 			]
 		}
 	}
