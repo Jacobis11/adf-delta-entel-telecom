@@ -1,0 +1,65 @@
+{
+	"name": "ds_hechos_datos",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_sql_dw_entel",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Gold"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "id_sesion_cinco",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "fecha_inicio",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "fecha_fin",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "duracion",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "subidos",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "descargados",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "total",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "id_origen_cinco",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "id_fecha_cinco",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "GOLD_CINCO",
+			"table": "hechos_datos_cinco"
+		}
+	}
+}

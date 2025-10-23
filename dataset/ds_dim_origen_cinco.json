@@ -1,0 +1,46 @@
+{
+	"name": "ds_dim_origen_cinco",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_sql_dw_entel",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Gold"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "id_origen_cinco",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "numero",
+				"type": "varchar"
+			},
+			{
+				"name": "imei",
+				"type": "varchar"
+			},
+			{
+				"name": "rbs_utilizada",
+				"type": "varchar"
+			},
+			{
+				"name": "celda",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "latitud_longitud",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "GOLD_CINCO",
+			"table": "dim_origen_cinco"
+		}
+	}
+}
