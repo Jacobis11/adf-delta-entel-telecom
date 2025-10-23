@@ -1,5 +1,5 @@
 {
-	"name": "pipeline_limpiar_llamadas",
+	"name": "pipeline_limpiar _datos",
 	"properties": {
 		"activities": [
 			{
@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "df_limpiar_llamadas",
+						"referenceName": "df_limpiar_datos",
 						"type": "DataFlowReference"
 					},
 					"compute": {
