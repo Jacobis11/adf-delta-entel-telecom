@@ -8,14 +8,77 @@
 		"typeProperties": {
 			"sources": [
 				{
-					"name": "source1"
+					"dataset": {
+						"referenceName": "ds_sql_05",
+						"type": "DatasetReference"
+					},
+					"name": "a05"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_sql_06",
+						"type": "DatasetReference"
+					},
+					"name": "a06"
 				}
 			],
 			"sinks": [],
-			"transformations": [],
+			"transformations": [
+				{
+					"name": "union1"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "cast1"
+				}
+			],
 			"scriptLines": [
-				"source(allowSchemaDrift: true,",
-				"     validateSchema: false) ~> source1"
+				"source(output(",
+				"          fecha_inicio as string,",
+				"          fecha_fin as string,",
+				"          numero as string,",
+				"          imei as string,",
+				"          rbs_utilizada as string,",
+				"          celda as string,",
+				"          latitud_longitud as string,",
+				"          subidos as string,",
+				"          descargados as string,",
+				"          total as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> a05",
+				"source(output(",
+				"          fecha_inicio as string,",
+				"          fecha_fin as string,",
+				"          numero as string,",
+				"          imei as string,",
+				"          rbs_utilizada as string,",
+				"          celda as string,",
+				"          latitud_longitud as string,",
+				"          subidos as string,",
+				"          descargados as string,",
+				"          total as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> a06",
+				"a05, a06 union(byName: true)~> union1",
+				"union1 derive(Latitud = substring(latitud_longitud, 0, instr(latitud_longitud, \",-\")-1),",
+				"          Longitud = substring(latitud_longitud,instr(latitud_longitud, \",-\")+1,length(latitud_longitud))) ~> derivedColumn1",
+				"derivedColumn1 cast(output(",
+				"          fecha_inicio as timestamp 'MM/dd/yyyy HH:mm:ss',",
+				"          fecha_fin as timestamp 'MM/dd/yyyy HH:mm:ss',",
+				"          numero as string,",
+				"          subidos as string,",
+				"          descargados as string,",
+				"          total as string",
+				"     ),",
+				"     errors: true) ~> cast1"
 			]
 		}
 	}
