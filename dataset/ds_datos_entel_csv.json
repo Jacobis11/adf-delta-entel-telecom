@@ -13,10 +13,10 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "cincos.csv",
+				"fileName": "cinco.csv",
 				"container": "raw-entel"
 			},
-			"columnDelimiter": ",",
+			"columnDelimiter": ";",
 			"escapeChar": "\\",
 			"firstRowAsHeader": true,
 			"quoteChar": "\""
@@ -47,7 +47,7 @@
 				"type": "String"
 			},
 			{
-				"name": "LATITUD_LONGITUD",
+				"name": "LATITUD LONGITUD",
 				"type": "String"
 			},
 			{

@@ -56,7 +56,15 @@
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          id_origen_cinco,",
+				"          numero,",
+				"          imei,",
+				"          rbs_utilizada,",
+				"          celda,",
+				"          latitud_longitud",
+				"     )) ~> sink1"
 			]
 		}
 	}

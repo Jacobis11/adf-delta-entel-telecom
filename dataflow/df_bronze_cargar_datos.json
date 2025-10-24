@@ -33,7 +33,7 @@
 				"          IMEI as string,",
 				"          RBS_UTILIZADA as string,",
 				"          CELDA as string,",
-				"          LATITUD_LONGITUD as string,",
+				"          {LATITUD LONGITUD} as string,",
 				"          SUBIDOS as string,",
 				"          DESCARGADOS as string,",
 				"          TOTAL as string",

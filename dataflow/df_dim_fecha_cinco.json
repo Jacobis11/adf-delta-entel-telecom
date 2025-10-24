@@ -1,0 +1,36 @@
+{
+	"name": "df_dim_fecha_cinco",
+	"properties": {
+		"folder": {
+			"name": "GOLD"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_dim_fecha_cinco",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [],
+			"transformations": [],
+			"scriptLines": [
+				"source(output(",
+				"          fecha as date,",
+				"          {año} as integer,",
+				"          mes as integer,",
+				"          mes_texto as string,",
+				"          dia_texto as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT DISTINCT\\n  CAST(FECHA_INICIO AS DATE)           AS fecha,\\n  YEAR(FECHA_INICIO)                   AS año,\\n  MONTH(FECHA_INICIO)                  AS mes,\\n  DATENAME(MONTH, FECHA_INICIO)        AS mes_texto,\\n  DATENAME(WEEKDAY, FECHA_INICIO)      AS dia_texto\\nFROM\\n  SILVER.DATOS\\nWHERE\\n  FECHA_INICIO IS NOT NULL',",
+				"     format: 'query') ~> source1"
+			]
+		}
+	}
+}
