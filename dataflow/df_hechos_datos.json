@@ -1,0 +1,129 @@
+{
+	"name": "df_hechos_datos",
+	"properties": {
+		"folder": {
+			"name": "GOLD"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_sql_silver_datos_entel",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_dim_origen_cinco",
+						"type": "DatasetReference"
+					},
+					"name": "Dimorigen"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_dim_fecha_cinco",
+						"type": "DatasetReference"
+					},
+					"name": "Dimfecha"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_hechos_datos",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "lookup1"
+				},
+				{
+					"name": "lookup2"
+				},
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          FECHA_INICIO as timestamp,",
+				"          FECHA_FIN as timestamp,",
+				"          NUMERO as string,",
+				"          IMEI as string,",
+				"          RBS_UTILIZADA as string,",
+				"          CELDA as integer,",
+				"          LATITUD_LONGITUD as string,",
+				"          SUBIDOS as long,",
+				"          DESCARGADOS as long,",
+				"          TOTAL as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> source1",
+				"source(output(",
+				"          id_origen_cinco as integer,",
+				"          numero as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT id_origen_cinco, NUMERO AS numero\\nFROM GOLD_CINCO.dim_origen_cinco\\n',",
+				"     format: 'query') ~> Dimorigen",
+				"source(output(",
+				"          id_fecha_cinco as integer,",
+				"          fecha as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT id_fecha_cinco, FECHA AS fecha   \\nFROM GOLD_CINCO.dim_fecha_cinco\\n',",
+				"     format: 'query') ~> Dimfecha",
+				"source1, Dimorigen lookup(source1@NUMERO == Dimorigen@numero,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup1",
+				"lookup1, Dimfecha lookup(FECHA_INICIO == fecha,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup2",
+				"lookup2 select(mapColumn(",
+				"          id_origen_cinco,",
+				"          id_fecha_cinco",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          id_sesion_cinco as integer,",
+				"          fecha_inicio as timestamp,",
+				"          fecha_fin as timestamp,",
+				"          duracion as integer,",
+				"          subidos as long,",
+				"          descargados as long,",
+				"          total as long,",
+				"          id_origen_cinco as integer,",
+				"          id_fecha_cinco as integer",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          id_origen_cinco,",
+				"          id_fecha_cinco",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}
