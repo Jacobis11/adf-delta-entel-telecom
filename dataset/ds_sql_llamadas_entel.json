@@ -70,7 +70,7 @@
 		],
 		"typeProperties": {
 			"schema": "BRONZE",
-			"table": "LLAMADA"
+			"table": "llamad"
 		}
 	}
 }
