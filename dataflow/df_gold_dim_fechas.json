@@ -29,7 +29,15 @@
 					"name": "fechafin"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_gold_dim_fecha",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
 					"name": "union1"
@@ -42,6 +50,9 @@
 				},
 				{
 					"name": "filter1"
+				},
+				{
+					"name": "aggregate1"
 				}
 			],
 			"scriptLines": [
@@ -72,7 +83,26 @@
 				"fechallamada, fechainicio union(byName: true)~> union1",
 				"union1, fechafin union(byName: true)~> union2",
 				"union2 sort(asc(fecha, true)) ~> sort1",
-				"sort1 filter(!isNull(fecha)) ~> filter1"
+				"sort1 filter(!isNull(fecha)) ~> filter1",
+				"filter1 aggregate(each(match(name!='fecha'), $$ = first($$))) ~> aggregate1",
+				"aggregate1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          id_fecha as integer,",
+				"          fecha as date,",
+				"          {año} as integer,",
+				"          mes as integer,",
+				"          mes_texto as string,",
+				"          dia_texto as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
 			]
 		}
 	}

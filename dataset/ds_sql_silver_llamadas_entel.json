@@ -71,7 +71,7 @@
 		],
 		"typeProperties": {
 			"schema": "SILVER",
-			"table": "LLAMADA"
+			"table": "llamad"
 		}
 	}
 }

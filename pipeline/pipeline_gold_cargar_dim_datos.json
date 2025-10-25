@@ -22,7 +22,7 @@
 					"scripts": [
 						{
 							"type": "Query",
-							"text": "DELETE FROM GOLD_CINCO.hechos_datos_cinco;\nDELETE FROM GOLD_CINCO.dim_origen_cinco;\nDELETE FROM GOLD_CINCO.dim_fecha_cinco;\n"
+							"text": "DELETE FROM GOLD.hechos_datos;\nDELETE FROM GOLD.dim_numero;\nDELETE FROM GOLD.dim_fecha;\n"
 						}
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"
@@ -48,6 +48,10 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_gold_dim_numero",
+						"type": "DataFlowReference"
+					},
 					"compute": {
 						"coreCount": 8,
 						"computeType": "General"
@@ -75,6 +79,10 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_gold_dim_fechas",
+						"type": "DataFlowReference"
+					},
 					"compute": {
 						"coreCount": 8,
 						"computeType": "General"

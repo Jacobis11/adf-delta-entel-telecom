@@ -22,7 +22,7 @@
 					"scripts": [
 						{
 							"type": "Query",
-							"text": "delete from [silver].[datos];"
+							"text": "delete from [silver].[dato];\r\ndelete from silver.llamada; "
 						}
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"
@@ -50,6 +50,37 @@
 				"typeProperties": {
 					"dataflow": {
 						"referenceName": "df_limpiar_datos",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "Data flow2",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "Data flow1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_limpiar_llamadas",
 						"type": "DataFlowReference"
 					},
 					"compute": {

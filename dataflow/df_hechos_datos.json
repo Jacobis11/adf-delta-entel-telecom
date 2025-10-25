@@ -8,12 +8,24 @@
 		"typeProperties": {
 			"sources": [
 				{
+					"dataset": {
+						"referenceName": "ds_sql_silver_datos",
+						"type": "DatasetReference"
+					},
 					"name": "source1"
 				},
 				{
+					"dataset": {
+						"referenceName": "ds_gold_dim_numero",
+						"type": "DatasetReference"
+					},
 					"name": "Dimorigen"
 				},
 				{
+					"dataset": {
+						"referenceName": "ds_gold_dim_fecha",
+						"type": "DatasetReference"
+					},
 					"name": "Dimfecha"
 				}
 			],
@@ -38,23 +50,54 @@
 				}
 			],
 			"scriptLines": [
-				"source(allowSchemaDrift: true,",
-				"     validateSchema: false) ~> source1",
-				"source(allowSchemaDrift: true,",
-				"     validateSchema: false) ~> Dimorigen",
-				"source(allowSchemaDrift: true,",
-				"     validateSchema: false) ~> Dimfecha",
-				"source1, Dimorigen lookup(source1@NUMERO == Dimorigen@numero,",
+				"source(output(",
+				"          fecha_inicio as timestamp,",
+				"          fecha_fin as timestamp,",
+				"          numero as string,",
+				"          imei as string,",
+				"          rbs_utilizada as string,",
+				"          celda as string,",
+				"          latitud as decimal(10,7),",
+				"          longitud as decimal(10,7),",
+				"          subidos as integer,",
+				"          descargados as integer,",
+				"          total as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT\\n  CAST(FECHA_INICIO AS DATE) AS FECHA_KEY, \\n  NUMERO,\\n  IMEI,\\n  SUBIDOS,\\n  DESCARGADOS,\\n  TOTAL\\nFROM SILVER.DATOS\\nWHERE FECHA_INICIO IS NOT NULL\\n',",
+				"     format: 'query') ~> source1",
+				"source(output(",
+				"          id_origen_cinco as integer,",
+				"          numero as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT id_origen_cinco, NUMERO AS numero\\nFROM GOLD_CINCO.dim_origen_cinco\\n',",
+				"     format: 'query') ~> Dimorigen",
+				"source(output(",
+				"          id_fecha as integer,",
+				"          fecha as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT id_fecha, FECHA AS fecha   \\nFROM GOLD.dim_fecha\\n',",
+				"     format: 'query') ~> Dimfecha",
+				"source1, Dimorigen lookup(source1@numero == Dimorigen@numero,",
 				"     multiple: false,",
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> lookup1",
-				"lookup1, Dimfecha lookup(FECHA_KEY == fecha,",
+				"lookup1, Dimfecha lookup(fecha_inicio == fecha",
+				"     && fecha_fin == fecha,",
 				"     multiple: false,",
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> lookup2",
 				"lookup2 select(mapColumn(",
 				"          id_origen_cinco,",
-				"          id_fecha_cinco",
+				"          id_fecha",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select1",
@@ -81,7 +124,7 @@
 				"     errorHandlingOption: 'stopOnFirstError',",
 				"     mapColumn(",
 				"          id_origen_cinco,",
-				"          id_fecha_cinco",
+				"          id_fecha_cinco = id_fecha",
 				"     )) ~> sink1"
 			]
 		}
